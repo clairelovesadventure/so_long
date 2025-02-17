@@ -6,7 +6,7 @@
 /*   By: shuxintan <shuxintan@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 19:44:22 by shutan            #+#    #+#             */
-/*   Updated: 2025/02/17 02:40:02 by shuxintan        ###   ########.fr       */
+/*   Updated: 2025/02/17 19:46:55 by shuxintan        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "libft.h"
 
 #ifndef USE_EXISTING_STRLEN
+
 size_t	ft_strlen(const char *s)
 {
 	size_t	i;

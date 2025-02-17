@@ -14,75 +14,109 @@
 # define MAP_HEIGHT 9
 # define RENDER_DELAY 2  // 控制渲染频率
 
-typedef struct s_map {
-    char    **grid;
-    size_t  width;
-    size_t  height;
-    int     collectibles;
-    int     exit;
-    int     player;
-} t_map;
+typedef struct s_map
+{
+	char		**grid;
+	size_t		width;
+	size_t		height;
+	int			collectibles;
+	int			exit;
+	int			player;
+}	t_map;
 
-typedef struct s_enemy {
-    size_t  x;
-    size_t  y;
-    int     direction;  // 0: 上, 1: 右, 2: 下, 3: 左
-} t_enemy;
+typedef struct s_enemy
+{
+	size_t		x;
+	size_t		y;
+	int			direction; // 0: 上, 1: 右, 2: 下, 3: 左
+}	t_enemy;
 
-typedef struct s_game {
-    void        *mlx;
-    mlx_image_t *win;
-    t_map       map;
-    int         moves;
-    size_t      player_x;
-    size_t      player_y;
-    int         window_width;
-    int         window_height;
-    
-    mlx_image_t *player_img;
-    mlx_image_t *wall_img;
-    mlx_image_t *collect_img;
-    mlx_image_t *exit_img;
-    mlx_image_t *floor_img;
-    
-    // 动画相关
-    mlx_texture_t *player_textures[4];
-    mlx_texture_t *collectible_textures[8];
-    int current_player_frame;
-    int current_collectible_frame;
-    int frame_counter;
-    
-    // 敌人相关
-    mlx_texture_t *enemy_texture;
-    mlx_image_t *enemy_img;
-    t_enemy *enemies;
-    int enemy_count;
+typedef struct s_game
+{
+	void			*mlx;
+	mlx_image_t		*win;
+	t_map			map;
+	int				moves;
+	size_t			player_x;
+	size_t			player_y;
+	int				window_width;
+	int				window_height;
 
-    // 其他纹理
-    mlx_texture_t *wall_texture;
-    mlx_texture_t *exit_texture;
-    mlx_texture_t *floor_texture;
-} t_game;
+	mlx_image_t		*player_img;
+	mlx_image_t		*wall_img;
+	mlx_image_t		*collect_img;
+	mlx_image_t		*exit_img;
+	mlx_image_t		*floor_img;
+
+	// 动画相关
+	mlx_texture_t	*player_textures[4];
+	mlx_texture_t	*collectible_textures[8];
+	int				current_player_frame;
+	int				current_collectible_frame;
+	int				frame_counter;
+
+	// 敌人相关
+	mlx_texture_t	*enemy_texture;
+	mlx_image_t		*enemy_img;
+	t_enemy			*enemies;
+	int				enemy_count;
+
+	// 其他纹理
+	mlx_texture_t	*wall_texture;
+	mlx_texture_t	*exit_texture;
+	mlx_texture_t	*floor_texture;
+}	t_game;
 
 // map_parser.c
-int     parse_map(t_game *game, char *filename);
+int		parse_map(t_game *game, char *filename);
 
 // game.c
-int     init_game(t_game *game);
-int     handle_key(int keycode, t_game *game);
+int		init_enemies(t_game *game);
+
+// game_cleanup.c
+void	cleanup(t_game *game);
+void	cleanup_hook(void *param);
+
+// game_movement.c
+int		can_move(t_game *game, size_t new_x, size_t new_y);
+void	update_position(t_game *game, size_t new_x, size_t new_y);
+void	key_hook(mlx_key_data_t keydata, void *param);
+
+// game_images.c
+int		load_images(t_game *game);
 
 // graphics.c
-int     init_graphics(t_game *game);
-void    render_game(t_game *game);
+void	render_game(t_game *game);
 
 // utils.c
-void    free_map(t_map *map);
-void    error_exit(char *message);
+void	free_map(t_map *map);
+void	error_exit(char *message);
 
 // 新增函数声明
-void update_animations(t_game *game);
-void move_enemies(t_game *game);
-int init_enemies(t_game *game);
-void check_enemy_collision(t_game *game);
+void	update_animations(t_game *game);
+void	move_enemies(t_game *game);
+void	check_enemy_collision(t_game *game);
+void	copy_grid_dir(t_game *game, char grid[MAP_HEIGHT][MAP_WIDTH],
+			int to_temp);
+void	update_enemy(t_game *game, char grid[MAP_HEIGHT][MAP_WIDTH], int i);
 
-#endif 
+// map_validation.c
+int		validate_map_chars(t_map *map);
+int		validate_map_shape(t_map *map);
+int		validate_map_walls(t_map *map);
+int		validate_map_path(t_map *map);
+
+// map_utils.c
+int		check_filename(char *filename);
+char	*read_line(int fd);
+void	init_map(t_map *map);
+
+// map_validation_utils.c
+char	**init_visited(t_map *map);
+void	cleanup_visited(char **visited, size_t height);
+int		check_path_validity(t_map *map, char **visited);
+
+// game_init.c
+int		init_game(t_game *game);
+
+#endif

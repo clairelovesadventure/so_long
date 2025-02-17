@@ -1,86 +1,117 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   animation.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: shutan <shutan@student.42.fr>             +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/02/17 19:53:32 by shutan           #+#    #+#             */
+/*   Updated: 2024/02/17 19:53:32 by shutan          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "so_long.h"
 
-void update_animations(t_game *game)
+void	update_animations(t_game *game)
 {
-    game->frame_counter++;
-    
-    // 只在需要时重新渲染
-    bool need_render = false;
-    
-    // 更新玩家动画
-    if (game->frame_counter % (ANIMATION_SPEED * 2) == 0)  // 降低动画速度
-    {
-        game->current_player_frame = (game->current_player_frame + 1) % 4;
-        game->current_collectible_frame = (game->current_collectible_frame + 1) % 8;
-        need_render = true;
-    }
-    
-    // 更新敌人位置
-    if (game->frame_counter % ENEMY_MOVE_INTERVAL == 0)
-    {
-        move_enemies(game);
-        need_render = true;
-    }
-    
-    // 检查与敌人的碰撞
-    check_enemy_collision(game);
-    
-    // 如果需要，进行渲染
-    if (need_render)
-        render_game(game);
+	bool	need_render;
+
+	game->frame_counter++;
+	need_render = false;
+	if (game->frame_counter % (ANIMATION_SPEED * 2) == 0)
+	{
+		game->current_player_frame = (game->current_player_frame + 1) % 4;
+		game->current_collectible_frame
+			= (game->current_collectible_frame + 1) % 8;
+		need_render = true;
+	}
+	if (game->frame_counter % ENEMY_MOVE_INTERVAL == 0)
+	{
+		move_enemies(game);
+		need_render = true;
+	}
+	check_enemy_collision(game);
+	if (need_render)
+		render_game(game);
 }
 
-void move_enemies(t_game *game)
+void	copy_grid_dir(t_game *game, char grid[MAP_HEIGHT][MAP_WIDTH],
+			int to_temp)
 {
-    static const int dx[] = {0, 1, 0, -1};  // 方向数组：上、右、下、左
-    static const int dy[] = {-1, 0, 1, 0};
-    char temp_grid[MAP_HEIGHT][MAP_WIDTH];  // 临时网格用于存储移动结果
-    
-    // 复制当前地图状态
-    for (size_t i = 0; i < game->map.height; i++)
-        for (size_t j = 0; j < game->map.width; j++)
-            temp_grid[i][j] = game->map.grid[i][j];
-    
-    for (int i = 0; i < game->enemy_count; i++)
-    {
-        t_enemy *enemy = &game->enemies[i];
-        int new_x = enemy->x + dx[enemy->direction];
-        int new_y = enemy->y + dy[enemy->direction];
-        
-        // 如果遇到障碍物或其他敌人，改变方向
-        if (game->map.grid[new_y][new_x] == '1' || 
-            game->map.grid[new_y][new_x] == 'C' || 
-            game->map.grid[new_y][new_x] == 'E' ||
-            game->map.grid[new_y][new_x] == 'N')
-        {
-            enemy->direction = (enemy->direction + 1) % 4;
-            temp_grid[enemy->y][enemy->x] = 'N';  // 保持原位置
-            continue;
-        }
-        
-        // 在临时网格中更新位置
-        temp_grid[enemy->y][enemy->x] = '0';
-        enemy->x = new_x;
-        enemy->y = new_y;
-        temp_grid[new_y][new_x] = 'N';
-    }
-    
-    // 将临时网格复制回游戏地图
-    for (size_t i = 0; i < game->map.height; i++)
-        for (size_t j = 0; j < game->map.width; j++)
-            game->map.grid[i][j] = temp_grid[i][j];
+	size_t	i;
+	size_t	j;
+
+	i = 0;
+	while (i < game->map.height)
+	{
+		j = 0;
+		while (j < game->map.width)
+		{
+			if (to_temp)
+				grid[i][j] = game->map.grid[i][j];
+			else
+				game->map.grid[i][j] = grid[i][j];
+			j++;
+		}
+		i++;
+	}
 }
 
-void check_enemy_collision(t_game *game)
+void	update_enemy(t_game *game, char grid[MAP_HEIGHT][MAP_WIDTH], int i)
 {
-    for (int i = 0; i < game->enemy_count; i++)
-    {
-        if (game->player_x == game->enemies[i].x && 
-            game->player_y == game->enemies[i].y)
-        {
-            ft_printf("Game Over! You were caught by an enemy!\n");
-            mlx_close_window(game->mlx);
-            return;
-        }
-    }
-} 
+	static const int	dx[] = {0, 1, 0, -1};
+	static const int	dy[] = {-1, 0, 1, 0};
+	t_enemy				*enemy;
+	int					new_x;
+	int					new_y;
+
+	enemy = &game->enemies[i];
+	new_x = enemy->x + dx[enemy->direction];
+	new_y = enemy->y + dy[enemy->direction];
+	if (game->map.grid[new_y][new_x] == '1' ||
+		game->map.grid[new_y][new_x] == 'C' ||
+		game->map.grid[new_y][new_x] == 'E' ||
+		game->map.grid[new_y][new_x] == 'N')
+	{
+		enemy->direction = (enemy->direction + 1) % 4;
+		grid[enemy->y][enemy->x] = 'N';
+		return ;
+	}
+	grid[enemy->y][enemy->x] = '0';
+	enemy->x = new_x;
+	enemy->y = new_y;
+	grid[new_y][new_x] = 'N';
+}
+
+void	move_enemies(t_game *game)
+{
+	char	temp_grid[MAP_HEIGHT][MAP_WIDTH];
+	int		i;
+
+	copy_grid_dir(game, temp_grid, 1);
+	i = 0;
+	while (i < game->enemy_count)
+	{
+		update_enemy(game, temp_grid, i);
+		i++;
+	}
+	copy_grid_dir(game, temp_grid, 0);
+}
+
+void	check_enemy_collision(t_game *game)
+{
+	int	i;
+
+	i = 0;
+	while (i < game->enemy_count)
+	{
+		if (game->player_x == game->enemies[i].x
+			&& game->player_y == game->enemies[i].y)
+		{
+			ft_printf("Game Over! You were caught by an enemy!\n");
+			mlx_close_window(game->mlx);
+			return ;
+		}
+		i++;
+	}
+}

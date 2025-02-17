@@ -14,13 +14,20 @@ ifeq ($(UNAME_S),Darwin)
     LIBS = -L./libft -lft
     LIBS += -L$(MLX42_BUILD) -lmlx42
     
-    # 检测是否在 42 School 环境
-    ifeq ($(shell test -d /usr/local/lib && echo yes),yes)
-        # 42 School macOS 路径
-        LIBS += -L/usr/local/lib -lglfw
-    else
-        # 个人 Mac 环境 (使用 homebrew)
+    # 检查并安装 GLFW
+    ifeq ($(shell which brew),)
+        $(error Homebrew is not installed. Please install Homebrew first)
+    endif
+    
+    ifeq ($(shell brew list | grep glfw),)
+        $(shell brew install glfw)
+    endif
+    
+    # 优先检查 homebrew 路径
+    ifeq ($(shell test -d /opt/homebrew/lib && echo yes),yes)
         LIBS += -L/opt/homebrew/lib -lglfw
+    else ifeq ($(shell test -d /usr/local/lib && echo yes),yes)
+        LIBS += -L/usr/local/lib -lglfw
     endif
 
     # macOS 框架
@@ -37,7 +44,8 @@ endif
 
 # 源文件
 SRCS = src/main.c src/map_parser.c src/game.c src/graphics.c src/utils.c \
-src/animation.c
+src/animation.c src/game_cleanup.c src/game_movement.c src/game_images.c \
+src/map_validation.c src/map_utils.c src/game_init.c src/map_validation_utils.c
 OBJS = $(SRCS:src/%.c=obj/%.o)
 
 # MLX42 设置
