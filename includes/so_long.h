@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   so_long.h                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: shutan <shutan@student.42berlin.de>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/17 21:35:11 by shutan            #+#    #+#             */
+/*   Updated: 2025/02/17 21:36:09 by shutan           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef SO_LONG_H
 # define SO_LONG_H
 
@@ -28,7 +40,7 @@ typedef struct s_enemy
 {
 	size_t		x;
 	size_t		y;
-	int			direction; // 0: 上, 1: 右, 2: 下, 3: 左
+	int			direction;
 }	t_enemy;
 
 typedef struct s_game
@@ -48,20 +60,17 @@ typedef struct s_game
 	mlx_image_t		*exit_img;
 	mlx_image_t		*floor_img;
 
-	// 动画相关
 	mlx_texture_t	*player_textures[4];
 	mlx_texture_t	*collectible_textures[8];
 	int				current_player_frame;
 	int				current_collectible_frame;
 	int				frame_counter;
 
-	// 敌人相关
 	mlx_texture_t	*enemy_texture;
 	mlx_image_t		*enemy_img;
 	t_enemy			*enemies;
 	int				enemy_count;
 
-	// 其他纹理
 	mlx_texture_t	*wall_texture;
 	mlx_texture_t	*exit_texture;
 	mlx_texture_t	*floor_texture;
