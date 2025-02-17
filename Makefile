@@ -9,9 +9,21 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
     MLX42_PATH = mlx_mac
     INCLUDES = -I./includes -I$(MLX42_PATH)/include -I./libft
+
+    # 基础库
     LIBS = -L./libft -lft
     LIBS += -L$(MLX42_BUILD) -lmlx42
-    LIBS += -L/opt/homebrew/lib -lglfw
+    
+    # 检测是否在 42 School 环境
+    ifeq ($(shell test -d /usr/local/lib && echo yes),yes)
+        # 42 School macOS 路径
+        LIBS += -L/usr/local/lib -lglfw
+    else
+        # 个人 Mac 环境 (使用 homebrew)
+        LIBS += -L/opt/homebrew/lib -lglfw
+    endif
+
+    # macOS 框架
     LIBS += -framework Cocoa -framework OpenGL -framework IOKit
 endif
 
