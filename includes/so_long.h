@@ -17,16 +17,16 @@
 typedef struct s_map {
     char    **grid;
     size_t  width;
-    int     height;
+    size_t  height;
     int     collectibles;
     int     exit;
     int     player;
 } t_map;
 
 typedef struct s_enemy {
-    size_t x;
-    int y;
-    int direction;  // 0: 上, 1: 右, 2: 下, 3: 左
+    size_t  x;
+    size_t  y;
+    int     direction;  // 0: 上, 1: 右, 2: 下, 3: 左
 } t_enemy;
 
 typedef struct s_game {
@@ -35,7 +35,7 @@ typedef struct s_game {
     t_map       map;
     int         moves;
     size_t      player_x;
-    int         player_y;
+    size_t      player_y;
     int         window_width;
     int         window_height;
     

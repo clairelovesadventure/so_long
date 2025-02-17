@@ -37,7 +37,7 @@ void move_enemies(t_game *game)
     char temp_grid[MAP_HEIGHT][MAP_WIDTH];  // 临时网格用于存储移动结果
     
     // 复制当前地图状态
-    for (int i = 0; i < game->map.height; i++)
+    for (size_t i = 0; i < game->map.height; i++)
         for (size_t j = 0; j < game->map.width; j++)
             temp_grid[i][j] = game->map.grid[i][j];
     
@@ -66,7 +66,7 @@ void move_enemies(t_game *game)
     }
     
     // 将临时网格复制回游戏地图
-    for (int i = 0; i < game->map.height; i++)
+    for (size_t i = 0; i < game->map.height; i++)
         for (size_t j = 0; j < game->map.width; j++)
             game->map.grid[i][j] = temp_grid[i][j];
 }

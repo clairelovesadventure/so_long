@@ -1,11 +1,12 @@
 #include "so_long.h"
 
 // 函数声明
-static void cleanup(t_game *game);
+void cleanup(t_game *game);
 static int load_images(t_game *game);
-static int can_move(t_game *game, int new_x, int new_y);
-static void update_position(t_game *game, int new_x, int new_y);
+static int can_move(t_game *game, size_t new_x, size_t new_y);
+static void update_position(t_game *game, size_t new_x, size_t new_y);
 static void key_hook(mlx_key_data_t keydata, void *param);
+static void cleanup_hook(void *param);
 
 static int load_images(t_game *game)
 {
@@ -48,7 +49,7 @@ static int load_images(t_game *game)
             game->floor_img && game->enemy_img);
 }
 
-static int can_move(t_game *game, int new_x, int new_y)
+static int can_move(t_game *game, size_t new_x, size_t new_y)
 {
     char target;
 
@@ -60,7 +61,7 @@ static int can_move(t_game *game, int new_x, int new_y)
     return (1);
 }
 
-static void update_position(t_game *game, int new_x, int new_y)
+static void update_position(t_game *game, size_t new_x, size_t new_y)
 {
     char *target;
 
@@ -72,24 +73,28 @@ static void update_position(t_game *game, int new_x, int new_y)
     }
     else if (*target == 'E' && game->map.collectibles == 0)
     {
-        ft_printf("You won in %d moves!\n", game->moves + 1);
-        cleanup(game);
+        game->moves++;  // 最后一步移动也要计数
+        ft_printf("You won in %d moves!\n", game->moves);
         mlx_close_window(game->mlx);
         return;
     }
-    game->map.grid[game->player_y][game->player_x] = '0';
-    game->player_x = new_x;
-    game->player_y = new_y;
-    game->map.grid[new_y][new_x] = 'P';
-    game->moves++;
-    ft_printf("Moves: %d\n", game->moves);
+    // 只有当位置真的改变时才更新移动次数
+    if (new_x != game->player_x || new_y != game->player_y)
+    {
+        game->map.grid[game->player_y][game->player_x] = '0';
+        game->player_x = new_x;
+        game->player_y = new_y;
+        game->map.grid[new_y][new_x] = 'P';
+        game->moves++;
+        ft_printf("Moves: %d\n", game->moves);
+    }
 }
 
 static void key_hook(mlx_key_data_t keydata, void *param)
 {
     t_game *game;
-    int new_x;
-    int new_y;
+    size_t new_x;
+    size_t new_y;
 
     if (keydata.action != MLX_PRESS)
         return;
@@ -100,9 +105,10 @@ static void key_hook(mlx_key_data_t keydata, void *param)
 
     if (keydata.key == MLX_KEY_ESCAPE)
     {
-        cleanup(game);
         mlx_close_window(game->mlx);
+        return;
     }
+    // 只处理移动键
     else if (keydata.key == MLX_KEY_W || keydata.key == MLX_KEY_UP)
         new_y--;
     else if (keydata.key == MLX_KEY_A || keydata.key == MLX_KEY_LEFT)
@@ -111,6 +117,8 @@ static void key_hook(mlx_key_data_t keydata, void *param)
         new_y++;
     else if (keydata.key == MLX_KEY_D || keydata.key == MLX_KEY_RIGHT)
         new_x++;
+    else
+        return;  // 如果不是移动键，直接返回
 
     if (can_move(game, new_x, new_y))
     {
@@ -119,7 +127,7 @@ static void key_hook(mlx_key_data_t keydata, void *param)
     }
 }
 
-static void cleanup(t_game *game)
+void cleanup(t_game *game)
 {
     // 清理静态图像
     if (game->floor_img)
@@ -162,6 +170,14 @@ static void cleanup(t_game *game)
         mlx_delete_texture(game->enemy_texture);
 }
 
+static void cleanup_hook(void *param)
+{
+    t_game *game;
+
+    game = (t_game *)param;
+    cleanup(game);
+}
+
 int init_game(t_game *game)
 {
     ft_printf("Initializing game...\n");
@@ -184,7 +200,7 @@ int init_game(t_game *game)
     game->current_collectible_frame = 0;
     
     // 找到玩家初始位置
-    for (int i = 0; i < game->map.height; i++)
+    for (size_t i = 0; i < game->map.height; i++)
     {
         for (size_t j = 0; j < game->map.width; j++)
         {
@@ -192,7 +208,8 @@ int init_game(t_game *game)
             {
                 game->player_x = j;
                 game->player_y = i;
-                ft_printf("Found player at %d,%d\n", j, i);
+                ft_printf("Found player at %d,%d\n", (int)j, (int)i);
+                break;
             }
         }
     }
@@ -230,6 +247,9 @@ int init_game(t_game *game)
 
     // 设置按键钩子
     mlx_key_hook(game->mlx, key_hook, game);
+
+    // 设置关闭钩子
+    mlx_close_hook(game->mlx, cleanup_hook, game);
 
     // 设置动画循环函数
     mlx_loop_hook(game->mlx, (void *)update_animations, game);

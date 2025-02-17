@@ -25,7 +25,7 @@ void render_game(t_game *game)
         }
         
         // 只渲染背景和静态元素
-        for (int i = 0; i < game->map.height; i++)
+        for (size_t i = 0; i < game->map.height; i++)
         {
             for (size_t j = 0; j < game->map.width; j++)
             {
@@ -83,7 +83,7 @@ void render_game(t_game *game)
     }
 
     // 更新动态元素位置
-    for (int i = 0; i < game->map.height; i++)
+    for (size_t i = 0; i < game->map.height; i++)
     {
         for (size_t j = 0; j < game->map.width; j++)
         {

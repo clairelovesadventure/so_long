@@ -26,3 +26,7 @@ mlx_mac_backup/
 # IDE specific
 .vscode/
 .idea/
+
+# New ignore rules
+README.md
+generate_textures.py

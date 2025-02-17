@@ -8,9 +8,11 @@ UNAME_S := $(shell uname -s)
 # MacOS 设置
 ifeq ($(UNAME_S),Darwin)
     MLX42_PATH = mlx_mac
-    INCLUDES = -I./includes -I./mlx_mac/include -I./libft
+    INCLUDES = -I./includes -I$(MLX42_PATH)/include -I./libft
     LIBS = -L./libft -lft
-    LIBS += -L$(MLX42_BUILD) -lmlx42 -L/opt/homebrew/lib -lglfw -framework Cocoa -framework OpenGL -framework IOKit
+    LIBS += -L$(MLX42_BUILD) -lmlx42
+    LIBS += -L/opt/homebrew/lib -lglfw
+    LIBS += -framework Cocoa -framework OpenGL -framework IOKit
 endif
 
 # Linux 设置
@@ -36,8 +38,11 @@ obj:
 	mkdir -p obj
 
 $(MLX42_LIB):
-	@cmake $(MLX42_PATH) -B $(MLX42_BUILD)
-	@make -C $(MLX42_BUILD) -j4
+	@if [ ! -d $(MLX42_PATH) ]; then \
+		git clone https://github.com/codam-coding-college/MLX42.git $(MLX42_PATH); \
+	fi
+	@cmake -B $(MLX42_BUILD) $(MLX42_PATH)
+	@cmake --build $(MLX42_BUILD) -j4
 
 libft/libft.a:
 	@make -C libft

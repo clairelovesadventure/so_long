@@ -4,14 +4,14 @@
 
 static int validate_map_chars(t_map *map)
 {
-    int i;
-    int j;
+    size_t i;
+    size_t j;
 
     i = 0;
     while (i < map->height)
     {
         j = 0;
-        while ((size_t)j < map->width)
+        while (j < map->width)
         {
             if (map->grid[i][j] != '0' && map->grid[i][j] != '1' &&
                 map->grid[i][j] != 'C' && map->grid[i][j] != 'E' &&
@@ -74,16 +74,21 @@ static char *read_line(int fd)
 
 static int validate_map_shape(t_map *map)
 {
-    int i;
+    size_t i;
 
-    ft_printf("First line width: %zu\n", map->width);
+    ft_printf("First line width: %d\n", (int)map->width);
 
     i = 1;
     while (i < map->height)
     {
-        ft_printf("Line %d width: %zu\n", i, ft_strlen(map->grid[i]));
-        if (ft_strlen(map->grid[i]) != map->width)
+        size_t line_width = ft_strlen(map->grid[i]);
+        ft_printf("Line %d width: %d\n", (int)i, (int)line_width);
+        if (line_width != map->width)
+        {
+            ft_printf("Invalid line width at line %d: expected %d, got %d\n", 
+                     (int)i, (int)map->width, (int)line_width);
             return (0);
+        }
         i++;
     }
     return (1);
@@ -91,11 +96,11 @@ static int validate_map_shape(t_map *map)
 
 static int validate_map_walls(t_map *map)
 {
-    int i;
+    size_t i;
     
     // 检查第一行和最后一行
     i = 0;
-    while ((size_t)i < map->width)
+    while (i < map->width)
     {
         if (map->grid[0][i] != '1' || map->grid[map->height - 1][i] != '1')
             return (0);
@@ -123,10 +128,10 @@ static int check_filename(char *filename)
     return (ft_strncmp(filename + len - 4, ".ber", 4) == 0);
 }
 
-static int flood_fill(t_map *map, int x, int y, char **visited)
+static int flood_fill(t_map *map, size_t x, size_t y, char **visited)
 {
     // 检查边界和墙
-    if (x < 0 || (size_t)x >= map->width || y < 0 || y >= map->height || 
+    if (x >= map->width || y >= map->height || 
         map->grid[y][x] == '1' || visited[y][x])
         return (0);
     
@@ -146,10 +151,10 @@ static int flood_fill(t_map *map, int x, int y, char **visited)
 static int validate_map_path(t_map *map)
 {
     char **visited;
-    int i;
-    int j;
-    int player_x;
-    int player_y;
+    size_t i;
+    size_t j;
+    size_t player_x;
+    size_t player_y;
     int valid;
 
     // 分配访问数组
@@ -172,13 +177,13 @@ static int validate_map_path(t_map *map)
     }
 
     // 找到玩家位置
-    player_x = -1;
-    player_y = -1;
+    player_x = 0;
+    player_y = 0;
     i = 0;
     while (i < map->height)
     {
         j = 0;
-        while ((size_t)j < map->width)
+        while (j < map->width)
         {
             if (map->grid[i][j] == 'P')
             {
@@ -188,7 +193,7 @@ static int validate_map_path(t_map *map)
             }
             j++;
         }
-        if (player_x != -1)
+        if (player_x != 0 || player_y != 0)
             break;
         i++;
     }
@@ -202,7 +207,7 @@ static int validate_map_path(t_map *map)
     while (i < map->height)
     {
         j = 0;
-        while ((size_t)j < map->width)
+        while (j < map->width)
         {
             if ((map->grid[i][j] == 'C' || map->grid[i][j] == 'E') && !visited[i][j])
             {
@@ -227,7 +232,7 @@ int parse_map(t_game *game, char *filename)
 {
     int     fd;
     char    *line;
-    int     i;
+    size_t i;
     int     line_count;
 
     ft_printf("Parsing map file: %s\n", filename);
@@ -355,11 +360,26 @@ int parse_map(t_game *game, char *filename)
         return (0);
     }
 
+    // 在验证成功后，找到并存储玩家位置
+    for (size_t i = 0; i < game->map.height; i++)
+    {
+        for (size_t j = 0; j < game->map.width; j++)
+        {
+            if (game->map.grid[i][j] == 'P')
+            {
+                game->player_x = j;
+                game->player_y = i;
+                break;
+            }
+        }
+    }
+
     ft_printf("Map validation successful:\n");
-    ft_printf("- Size: %dx%d\n", game->map.width, game->map.height);
+    ft_printf("- Size: %dx%d\n", (int)game->map.width, (int)game->map.height);
     ft_printf("- Collectibles: %d\n", game->map.collectibles);
     ft_printf("- Exit: %d\n", game->map.exit);
     ft_printf("- Player: %d\n", game->map.player);
+    ft_printf("Found player at %d,%d\n", (int)game->player_x, (int)game->player_y);
 
     close(fd);
     return (1);
@@ -367,11 +387,12 @@ int parse_map(t_game *game, char *filename)
 
 int init_enemies(t_game *game)
 {
-    int i, j, count = 0;
+    size_t i, j;
+    int count = 0;
     
     // 计算敌人数量
     for (i = 0; i < game->map.height; i++)
-        for (j = 0; j < (int)game->map.width; j++)
+        for (j = 0; j < game->map.width; j++)
             if (game->map.grid[i][j] == 'N')
                 count++;
     
@@ -388,7 +409,7 @@ int init_enemies(t_game *game)
     count = 0;
     for (i = 0; i < game->map.height; i++)
     {
-        for (j = 0; j < (int)game->map.width; j++)
+        for (j = 0; j < game->map.width; j++)
         {
             if (game->map.grid[i][j] == 'N')
             {

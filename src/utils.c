@@ -4,13 +4,16 @@
 
 void free_map(t_map *map)
 {
-    int i;
+    size_t i;
 
     if (map->grid)
     {
         i = 0;
         while (i < map->height)
-            free(map->grid[i++]);
+        {
+            free(map->grid[i]);
+            i++;
+        }
         free(map->grid);
         map->grid = NULL;
     }
