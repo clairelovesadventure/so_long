@@ -6,7 +6,7 @@
 /*   By: shuxintan <shuxintan@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 21:32:08 by shutan            #+#    #+#             */
-/*   Updated: 2025/02/20 18:43:26 by shuxintan        ###   ########.fr       */
+/*   Updated: 2025/02/20 18:49:44 by shuxintan        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 
 static void	cleanup_images(t_game *game)
 {
+	if (!game || !game->mlx)
+		return ;
+	if (game->moves_text)
+		mlx_delete_image(game->mlx, game->moves_text);
 	if (game->floor_img)
 		mlx_delete_image(game->mlx, game->floor_img);
 	if (game->wall_img)
@@ -60,17 +64,13 @@ void	cleanup(t_game *game)
 {
 	if (!game)
 		return ;
-	if (game->moves_text)
-		mlx_delete_image(game->mlx, game->moves_text);
+	cleanup_images(game);
+	cleanup_textures(game);
 	if (game->enemies)
 		free(game->enemies);
+	free_map(&game->map);
 	if (game->mlx)
-	{
-		cleanup_images(game);
-		cleanup_textures(game);
-		free_map(&game->map);
 		mlx_terminate(game->mlx);
-	}
 }
 
 void	cleanup_hook(void *param)
