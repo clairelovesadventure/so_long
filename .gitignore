@@ -34,4 +34,5 @@ generate_textures.py
 obj/
 
 Note-solong.md
-解释makefile.md
+makefile-explain.md
+generate_textures.py
