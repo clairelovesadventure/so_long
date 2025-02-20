@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   so_long.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: shuxintan <shuxintan@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 21:35:11 by shutan            #+#    #+#             */
-/*   Updated: 2025/02/17 21:36:09 by shutan           ###   ########.fr       */
+/*   Updated: 2025/02/19 17:02:06 by shuxintan        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ typedef struct s_game
 	mlx_image_t		*collect_img;
 	mlx_image_t		*exit_img;
 	mlx_image_t		*floor_img;
+	mlx_image_t		*moves_text;
 
 	mlx_texture_t	*player_textures[4];
 	mlx_texture_t	*collectible_textures[8];
@@ -95,7 +96,10 @@ void	key_hook(mlx_key_data_t keydata, void *param);
 int		load_images(t_game *game);
 
 // graphics.c
+int		render_static_tile(t_game *game, size_t i, size_t j);
+int		render_dynamic_tile(t_game *game, size_t i, size_t j);
 void	render_game(t_game *game);
+void	update_moves_display(t_game *game);
 
 // utils.c
 void	free_map(t_map *map);
@@ -120,7 +124,7 @@ int		check_filename(char *filename);
 char	*read_line(int fd);
 void	init_map(t_map *map);
 
-// map_validation_utils.c
+// map_path.c
 char	**init_visited(t_map *map);
 void	cleanup_visited(char **visited, size_t height);
 int		check_path_validity(t_map *map, char **visited);

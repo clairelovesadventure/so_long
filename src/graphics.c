@@ -3,78 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   graphics.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: shuxintan <shuxintan@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 21:32:59 by shutan            #+#    #+#             */
-/*   Updated: 2025/02/17 21:32:59 by shutan           ###   ########.fr       */
+/*   Updated: 2025/02/19 14:48:11 by shuxintan        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "so_long.h"
 
-static int	render_static_tile(t_game *game, size_t i, size_t j)
+int	render_static_tile(t_game *game, size_t i, size_t j);
+int	render_dynamic_tile(t_game *game, size_t i, size_t j);
+
+static int	init_static_images(t_game *game)
 {
-	int	x;
-	int	y;
-
-	x = j * TILE_SIZE;
-	y = i * TILE_SIZE;
-	if (mlx_image_to_window(game->mlx, game->floor_img, x, y) < 0)
-		return (0);
-	if (game->map.grid[i][j] == '1' && mlx_image_to_window(game->mlx,
-			game->wall_img, x, y) < 0)
-		return (0);
-	if (game->map.grid[i][j] == 'E' && mlx_image_to_window(game->mlx,
-			game->exit_img, x, y) < 0)
-		return (0);
-	return (1);
-}
-
-static int	render_dynamic_tile(t_game *game, size_t i, size_t j)
-{
-	int	x;
-	int	y;
-
-	x = j * TILE_SIZE;
-	y = i * TILE_SIZE;
-	if (game->map.grid[i][j] == 'P' && mlx_image_to_window(game->mlx,
-			game->player_img, x, y) < 0)
-		return (0);
-	if (game->map.grid[i][j] == 'C' && mlx_image_to_window(game->mlx,
-			game->collect_img, x, y) < 0)
-		return (0);
-	if (game->map.grid[i][j] == 'N' && mlx_image_to_window(game->mlx,
-			game->enemy_img, x, y) < 0)
-		return (0);
-	return (1);
-}
-
-static int	init_and_render_static(t_game *game)
-{
-	size_t	i;
-	size_t	j;
-
 	game->floor_img = mlx_texture_to_image(game->mlx, game->floor_texture);
 	game->wall_img = mlx_texture_to_image(game->mlx, game->wall_texture);
 	game->exit_img = mlx_texture_to_image(game->mlx, game->exit_texture);
-	if (!game->floor_img || !game->wall_img || !game->exit_img)
-		return (0);
-	i = -1;
-	while (++i < game->map.height)
-	{
-		j = -1;
-		while (++j < game->map.width)
-			if (!render_static_tile(game, i, j))
-				return (0);
-	}
-	return (1);
+	return (game->floor_img && game->wall_img && game->exit_img);
 }
 
-static int	update_and_render_dynamic(t_game *game)
+static int	init_dynamic_images(t_game *game)
 {
-	size_t	i;
-	size_t	j;
-
 	if (game->player_img)
 		mlx_delete_image(game->mlx, game->player_img);
 	if (game->collect_img)
@@ -86,15 +36,25 @@ static int	update_and_render_dynamic(t_game *game)
 	game->collect_img = mlx_texture_to_image(game->mlx,
 			game->collectible_textures[game->current_collectible_frame]);
 	game->enemy_img = mlx_texture_to_image(game->mlx, game->enemy_texture);
-	if (!game->player_img || !game->collect_img || !game->enemy_img)
-		return (0);
+	return (game->player_img && game->collect_img && game->enemy_img);
+}
+
+static int	render_map(t_game *game, int is_static)
+{
+	size_t	i;
+	size_t	j;
+
 	i = -1;
 	while (++i < game->map.height)
 	{
 		j = -1;
 		while (++j < game->map.width)
-			if (!render_dynamic_tile(game, i, j))
+		{
+			if (is_static && !render_static_tile(game, i, j))
 				return (0);
+			if (!is_static && !render_dynamic_tile(game, i, j))
+				return (0);
+		}
 	}
 	return (1);
 }
@@ -108,9 +68,19 @@ void	render_game(t_game *game)
 	if (first_render)
 	{
 		first_render = 0;
-		if (!init_and_render_static(game))
+		if (!init_static_images(game) || !render_map(game, 1))
 			return ;
 	}
-	if (!update_and_render_dynamic(game))
+	if (!init_dynamic_images(game) || !render_map(game, 0))
 		return ;
+}
+
+void	update_moves_display(t_game *game)
+{
+	char	moves_str[32];
+
+	if (game->moves_text)
+		mlx_delete_image(game->mlx, game->moves_text);
+	snprintf(moves_str, sizeof(moves_str), "Moves: %d", game->moves);
+	game->moves_text = mlx_put_string(game->mlx, moves_str, 10, 10);
 }

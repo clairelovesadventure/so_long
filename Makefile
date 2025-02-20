@@ -1,6 +1,7 @@
 NAME = so_long
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g
+LDFLAGS = -fsanitize=address
 
 # 自动检测操作系统
 UNAME_S := $(shell uname -s)
@@ -32,6 +33,8 @@ ifeq ($(UNAME_S),Darwin)
 
     # macOS 框架
     LIBS += -framework Cocoa -framework OpenGL -framework IOKit
+else
+    LDFLAGS += -static-libsan
 endif
 
 # Linux 设置
@@ -45,7 +48,7 @@ endif
 # 源文件
 SRCS = src/main.c src/map_parser.c src/game.c src/graphics.c src/utils.c \
 src/animation.c src/game_cleanup.c src/game_movement.c src/game_images.c \
-src/map_validation.c src/map_utils.c src/game_init.c src/map_validation_utils.c
+src/map_validation.c src/map_utils.c src/game_init.c src/map_path.c src/render.c
 OBJS = $(SRCS:src/%.c=obj/%.o)
 
 # MLX42 设置
@@ -59,7 +62,7 @@ obj:
 
 $(MLX42_LIB):
 	@if [ ! -d $(MLX42_PATH) ]; then \
-		git clone https://github.com/codam-coding-college/MLX42.git $(MLX42_PATH); \
+		git clone --depth=1 https://github.com/codam-coding-college/MLX42.git $(MLX42_PATH); \
 	fi
 	@cmake -B $(MLX42_BUILD) $(MLX42_PATH)
 	@cmake --build $(MLX42_BUILD) -j4
@@ -68,7 +71,7 @@ libft/libft.a:
 	@make -C libft
 
 $(NAME): $(OBJS)
-	$(CC) $(OBJS) $(LIBS) -o $(NAME)
+	$(CC) $(OBJS) $(LIBS) $(LDFLAGS) -o $(NAME)
 
 obj/%.o: src/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@

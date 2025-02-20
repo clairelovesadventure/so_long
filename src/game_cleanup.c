@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game_cleanup.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: shuxintan <shuxintan@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 21:32:08 by shutan            #+#    #+#             */
-/*   Updated: 2025/02/17 21:32:09 by shutan           ###   ########.fr       */
+/*   Updated: 2025/02/18 23:59:47 by shuxintan        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,8 @@ static void	cleanup_other_textures(t_game *game)
 
 void	cleanup(t_game *game)
 {
+	if (game->moves_text)
+		mlx_delete_image(game->mlx, game->moves_text);
 	if (game->enemies)
 		free(game->enemies);
 	if (game->mlx)

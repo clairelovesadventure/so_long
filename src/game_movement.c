@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game_movement.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: shuxintan <shuxintan@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 21:32:49 by shutan            #+#    #+#             */
-/*   Updated: 2025/02/17 21:32:49 by shutan           ###   ########.fr       */
+/*   Updated: 2025/02/18 00:28:41 by shuxintan        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ void	update_position(t_game *game, size_t new_x, size_t new_y)
 		game->map.grid[new_y][new_x] = 'P';
 		game->moves++;
 		ft_printf("Moves: %d\n", game->moves);
+		update_moves_display(game);
 	}
 }
 

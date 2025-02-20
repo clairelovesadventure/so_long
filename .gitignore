@@ -14,7 +14,7 @@ so_long
 *.dSYM/
 
 # MLX build directory
-mlx_mac/build/
+mlx_mac/
 mlx_linux/
 mlx_mac_backup/
 
@@ -30,3 +30,8 @@ mlx_mac_backup/
 # New ignore rules
 README.md
 generate_textures.py
+
+# Build files
+obj/
+
+Note-solong.md

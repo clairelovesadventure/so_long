@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game_init.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: shuxintan <shuxintan@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 21:32:41 by shutan            #+#    #+#             */
-/*   Updated: 2025/02/17 21:32:42 by shutan           ###   ########.fr       */
+/*   Updated: 2025/02/18 00:00:19 by shuxintan        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ static void	init_null_pointers(t_game *game)
 	game->exit_texture = NULL;
 	game->floor_texture = NULL;
 	game->enemy_texture = NULL;
+	game->moves_text = NULL;
 }
 
 static int	find_player_position(t_game *game)
