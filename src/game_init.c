@@ -6,7 +6,7 @@
 /*   By: shuxintan <shuxintan@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 21:32:41 by shutan            #+#    #+#             */
-/*   Updated: 2025/02/18 00:00:19 by shuxintan        ###   ########.fr       */
+/*   Updated: 2025/02/20 18:54:03 by shuxintan        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,13 +86,22 @@ static int	init_hooks(t_game *game)
 int	init_game(t_game *game)
 {
 	if (!init_window(game))
+	{
+		free_map(&game->map);
 		return (0);
+	}
 	if (!find_player_position(game))
 		return (0);
 	init_null_pointers(game);
 	if (!load_images(game))
+	{
+		cleanup(game);
 		return (0);
+	}
 	if (!init_enemies(game))
+	{
+		cleanup(game);
 		return (0);
+	}
 	return (init_hooks(game));
 }

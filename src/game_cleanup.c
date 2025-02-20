@@ -6,13 +6,13 @@
 /*   By: shuxintan <shuxintan@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 21:32:08 by shutan            #+#    #+#             */
-/*   Updated: 2025/02/20 18:49:44 by shuxintan        ###   ########.fr       */
+/*   Updated: 2025/02/20 18:57:25 by shuxintan        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "so_long.h"
 
-static void	cleanup_images(t_game *game)
+void	cleanup_images(t_game *game)
 {
 	if (!game || !game->mlx)
 		return ;
@@ -32,15 +32,18 @@ static void	cleanup_images(t_game *game)
 		mlx_delete_image(game->mlx, game->enemy_img);
 }
 
-static void	cleanup_textures(t_game *game)
+static void	cleanup_player_textures(t_game *game)
 {
 	int	i;
 
+	if (!game)
+		return ;
 	i = 0;
 	while (i < 4)
 	{
 		if (game->player_textures[i])
 			mlx_delete_texture(game->player_textures[i]);
+		game->player_textures[i] = NULL;
 		i++;
 	}
 	i = 0;
@@ -50,6 +53,13 @@ static void	cleanup_textures(t_game *game)
 			mlx_delete_texture(game->collectible_textures[i]);
 		i++;
 	}
+}
+
+void	cleanup_textures(t_game *game)
+{
+	if (!game)
+		return ;
+	cleanup_player_textures(game);
 	if (game->wall_texture)
 		mlx_delete_texture(game->wall_texture);
 	if (game->exit_texture)
@@ -64,13 +74,19 @@ void	cleanup(t_game *game)
 {
 	if (!game)
 		return ;
-	cleanup_images(game);
-	cleanup_textures(game);
-	if (game->enemies)
-		free(game->enemies);
-	free_map(&game->map);
 	if (game->mlx)
+	{
+		cleanup_images(game);
+		cleanup_textures(game);
 		mlx_terminate(game->mlx);
+		game->mlx = NULL;
+	}
+	if (game->enemies)
+	{
+		free(game->enemies);
+		game->enemies = NULL;
+	}
+	free_map(&game->map);
 }
 
 void	cleanup_hook(void *param)

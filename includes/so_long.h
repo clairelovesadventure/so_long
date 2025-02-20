@@ -6,7 +6,7 @@
 /*   By: shuxintan <shuxintan@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 21:35:11 by shutan            #+#    #+#             */
-/*   Updated: 2025/02/19 17:02:06 by shuxintan        ###   ########.fr       */
+/*   Updated: 2025/02/20 18:56:51 by shuxintan        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,8 @@ int		init_enemies(t_game *game);
 // game_cleanup.c
 void	cleanup(t_game *game);
 void	cleanup_hook(void *param);
+void	cleanup_images(t_game *game);
+void	cleanup_textures(t_game *game);
 
 // game_movement.c
 int		can_move(t_game *game, size_t new_x, size_t new_y);

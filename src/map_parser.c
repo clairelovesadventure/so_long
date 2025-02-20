@@ -6,7 +6,7 @@
 /*   By: shuxintan <shuxintan@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 21:33:18 by shutan            #+#    #+#             */
-/*   Updated: 2025/02/20 18:16:37 by shuxintan        ###   ########.fr       */
+/*   Updated: 2025/02/20 18:54:02 by shuxintan        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ static int	validate_and_load(t_game *game, char *filename)
 	if (!load_map_data(game, fd))
 	{
 		close(fd);
+		free_map(&game->map);
 		return (0);
 	}
 	close(fd);
