@@ -28,7 +28,6 @@ mlx_mac_backup/
 .idea/
 
 # New ignore rules
-README.md
 generate_textures.py
 
 # Build files
@@ -36,4 +35,3 @@ obj/
 
 Note-solong.md
 解释makefile.md
-*.md

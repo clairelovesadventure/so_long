@@ -6,7 +6,7 @@
 /*   By: shuxintan <shuxintan@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 21:33:08 by shutan            #+#    #+#             */
-/*   Updated: 2025/02/19 00:08:44 by shuxintan        ###   ########.fr       */
+/*   Updated: 2025/02/20 18:33:51 by shuxintan        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,7 @@ int	check_filename(char *filename)
 	size_t	len;
 
 	len = ft_strlen(filename);
-	if (len < 4)
-		return (0);
-	return (ft_strncmp(filename + len - 4, ".ber", 4) == 0);
+	return (len > 4 && !ft_strncmp(filename + len - 4, ".ber", 4));
 }
 
 static char	*create_temp(char *line, char c, int len)
@@ -71,4 +69,23 @@ void	init_map(t_map *map)
 	map->collectibles = 0;
 	map->exit = 0;
 	map->player = 0;
+}
+
+int	load_map_data(t_game *game, int fd)
+{
+	char	*line;
+	size_t	i;
+
+	game->map.grid = malloc(sizeof(char *) * game->map.height);
+	if (!game->map.grid)
+		return (0);
+	i = 0;
+	line = read_line(fd);
+	while (line && i < game->map.height)
+	{
+		game->map.grid[i] = line;
+		i++;
+		line = read_line(fd);
+	}
+	return (1);
 }

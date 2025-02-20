@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   map_validation.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: shuxintan <shuxintan@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 21:34:06 by shutan            #+#    #+#             */
-/*   Updated: 2025/02/17 21:34:07 by shutan           ###   ########.fr       */
+/*   Updated: 2025/02/20 18:32:54 by shuxintan        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "so_long.h"
 
+// 验证地图字符
 int	validate_map_chars(t_map *map)
 {
 	size_t	i;
@@ -40,6 +41,7 @@ int	validate_map_chars(t_map *map)
 	return (map->collectibles > 0 && map->exit == 1 && map->player == 1);
 }
 
+// 验证地图形状
 int	validate_map_shape(t_map *map)
 {
 	size_t	i;
@@ -54,6 +56,7 @@ int	validate_map_shape(t_map *map)
 	return (1);
 }
 
+// 验证地图墙壁
 int	validate_map_walls(t_map *map)
 {
 	size_t	i;
@@ -93,6 +96,7 @@ static void	flood_fill_from_pos(t_map *map, char **visited, size_t i, size_t j)
 	}
 }
 
+// 验证地图路径
 int	validate_map_path(t_map *map)
 {
 	char	**visited;
@@ -100,10 +104,10 @@ int	validate_map_path(t_map *map)
 	size_t	j;
 	int		valid;
 
+	i = 0;
 	visited = init_visited(map);
 	if (!visited)
 		return (0);
-	i = 0;
 	while (i < map->height)
 	{
 		j = 0;
